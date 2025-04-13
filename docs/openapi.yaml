@@ -631,7 +631,6 @@ components:
           format: int32
     MakeOrderRequest:
       required:
-        - needSpendBonuses
         - pickUpPointId
       type: object
       properties:
@@ -642,24 +641,31 @@ components:
         pickUpPointId:
           type: string
           format: uuid
-        needSpendBonuses:
-          type: boolean
     SignUpRequest:
       required:
+        - login
         - password
-        - username
         - email
-        - name
+        - firstname
         - surname
+        - patronymic
       type: object
       properties:
-        username:
+        login:
           maxLength: 20
           minLength: 3
           type: string
         password:
           maxLength: 20
           minLength: 3
+          type: string
+        email:
+          type: string
+        firstname:
+          type: string
+        surname:
+          type: string
+        patronymic:
           type: string
     JwtAuthenticationResponse:
       type: object
@@ -670,7 +676,7 @@ components:
           type: string
     SignInRequest:
       required:
-        - username
+        - login
         - password
       type: object
       properties:
@@ -688,11 +694,16 @@ components:
     UserInfoResponse:
       type: object
       properties:
-        username:
+        login:
           type: string
-        bonuses:
-          type: integer
-          format: int32
+        email:
+          type: string
+        firstname:
+          type: string
+        surname:
+          type: string
+        patronymic:
+          type: string
     ProductPageResponse:
       type: object
       properties:
@@ -770,10 +781,7 @@ components:
             - received
         pickUpPointAddress:
           type: string
-        initialCost:
-          type: integer
-          format: int32
-        paidByBonuses:
+        cost:
           type: integer
           format: int32
     Category:
