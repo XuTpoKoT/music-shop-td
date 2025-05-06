@@ -8,7 +8,6 @@ on:
 jobs:      
   deploy:
     name: deploy
-    needs: lint
     runs-on: self-hosted  
     steps:
       - name: Deploy with Docker Compose
