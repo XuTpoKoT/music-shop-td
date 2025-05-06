@@ -32,7 +32,11 @@ class ManufacturerAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in Product._meta.local_fields if field.name not in ("characteristics", "img_ref", "description")]
+    list_display = [
+        field.name
+        for field in Product._meta.local_fields
+        if field.name not in ("characteristics", "img_ref", "description")
+    ]
     list_filter = ("color", "manufacturer", "category")
     search_fields = ("name", "description", "manufacturer")
     list_per_page = 50
@@ -40,9 +44,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = [
-        field.name for field in Order._meta.get_fields() if field.name not in ("pickup_point", "items")
-    ]
+    list_display = [field.name for field in Order._meta.get_fields() if field.name not in ("items")]
     list_editable = ("status",)
     list_per_page = 50
 
@@ -98,13 +100,13 @@ class CartAdmin(admin.ModelAdmin):
     items_count.short_description = "Товаров в корзине"
 
 
-@admin.register(CartItem)
-class CartItemAdmin(admin.ModelAdmin):
-    list_display = ["cart", "product", "quantity", "total_price_display"]
-    list_filter = ["cart__user", "product"]
-    search_fields = ["product__name", "cart__user__username"]
+# @admin.register(CartItem)
+# class CartItemAdmin(admin.ModelAdmin):
+#     list_display = ["cart", "product", "quantity", "total_price_display"]
+#     list_filter = ["cart__user", "product"]
+#     search_fields = ["product__name", "cart__user__username"]
 
-    def total_price_display(self, obj):
-        return f"{obj.total_price()} ₽"
+#     def total_price_display(self, obj):
+#         return f"{obj.total_price()} ₽"
 
-    total_price_display.short_description = "Сумма"
+#     total_price_display.short_description = "Сумма"

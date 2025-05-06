@@ -57,6 +57,9 @@ class PickUpPoint(models.Model):
     address = models.CharField(max_length=1000, verbose_name="Адрес")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
 
+    def __str__(self):
+        return f"{self.address}"
+
 
 class User(models.Model):
     class Meta:
@@ -72,7 +75,7 @@ class User(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     def __str__(self):
-        return f"{self.login}"
+        return f"{self.surname} {self.firstname} {self.patronymic} ({self.login})"
 
     def set_password(self, password):
         self.password = hashlib.sha256(password.encode()).hexdigest()
@@ -93,8 +96,8 @@ class Cart(models.Model):
         verbose_name = "Корзина"
         verbose_name_plural = "Корзины"
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="cart")
-    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="cart", verbose_name="Пользователь")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
 
     def total_price(self):
         return sum(item.total_price() for item in self.items.all())
@@ -124,9 +127,9 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items", verbose_name="Заказ")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Товар")
+    quantity = models.PositiveIntegerField(default=1, verbose_name="Количество")
 
     class Meta:
         unique_together = ("order", "product")
@@ -139,9 +142,9 @@ class OrderItem(models.Model):
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items", verbose_name="Корзина")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Продукт")
+    quantity = models.PositiveIntegerField(default=1, verbose_name="Количество")
 
     class Meta:
         unique_together = (
