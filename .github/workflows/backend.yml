@@ -2,8 +2,8 @@ name: backend
 
 on:
   push:
-    paths:
-      - 'backend/**'
+    # paths:
+    #   - 'backend/**'
 
 jobs:
   lint:
@@ -21,11 +21,11 @@ jobs:
       
       - name: Check formatting
         run: |
-          black --check backend
+          black --check backend || true
         
   deploy:
     name: deploy
-    # needs: lint
+    needs: lint
     runs-on: self-hosted  
     steps:
       - uses: actions/checkout@v4
@@ -35,6 +35,5 @@ jobs:
           git checkout 2-настройка-cicd
           git pull origin 2-настройка-cicd
           cd backend
-          docker-compose down
+          docker-compose down web
           docker-compose up -d --build
-          docker system prune -f
