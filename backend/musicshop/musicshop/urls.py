@@ -25,6 +25,7 @@ from main.views import (
     SignInView,
     OrderView,
     CategoryView,
+    ManufacturerView,
 )
 from django.contrib import admin
 
@@ -38,4 +39,5 @@ urlpatterns = [
     path("v1/signup", SignUpView.as_view(), name="signup"),
     path("v1/orders", OrderView.as_view(), name="orders"),
     path("v1/categories", CategoryView.as_view(), name="categories"),
+    path("v1/manufacturers", ManufacturerView.as_view(), name="manufacturers"),
 ]

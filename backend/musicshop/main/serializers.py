@@ -1,5 +1,14 @@
 from rest_framework import serializers
-from .models import PickUpPoint, Product, Category, Order, User, CartItem, Cart
+from .models import (
+    PickUpPoint,
+    Product,
+    Category,
+    Order,
+    User,
+    CartItem,
+    Cart,
+    Manufacturer,
+)
 
 
 class PickUpPointSerializer(serializers.ModelSerializer):
@@ -11,6 +20,12 @@ class PickUpPointSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
+        fields = "__all__"
+
+
+class ManufacturerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Manufacturer
         fields = "__all__"
 
 
@@ -36,7 +51,9 @@ class OrderResponseSerializer(serializers.ModelSerializer):
         status = data.pop("status")
         data["status"] = Order.Status(status).label
         data["customerUsername"] = User.objects.get(pk=data.pop("user")).email
-        data["pickUpPointAddress"] = PickUpPoint.objects.get(pk=data.pop("pickup_point")).address
+        data["pickUpPointAddress"] = PickUpPoint.objects.get(
+            pk=data.pop("pickup_point")
+        ).address
         return data
 
 

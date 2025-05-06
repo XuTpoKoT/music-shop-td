@@ -1,7 +1,16 @@
 from django.contrib import admin
 from django.db import models
 from typing import Iterable
-from .models import Product, Order, PickUpPoint, User, Cart, CartItem, Category
+from .models import (
+    Product,
+    Order,
+    PickUpPoint,
+    User,
+    Cart,
+    CartItem,
+    Category,
+    Manufacturer,
+)
 from django.utils.html import format_html
 
 
@@ -16,10 +25,17 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ("name",)
 
 
+@admin.register(Manufacturer)
+class ManufacturerAdmin(admin.ModelAdmin):
+    list_display = ["id", "name"]
+    list_filter = ("name",)
+    search_fields = ("name",)
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
 
-    list_display = [field.name for field in Product._meta.local_fields] + ["category"]
+    list_display = [field.name for field in Product._meta.local_fields]
     list_filter = ("color", "manufacturer", "category")
     search_fields = ("name", "description", "manufacturer")
     list_per_page = 50

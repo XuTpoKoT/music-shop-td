@@ -19,6 +19,17 @@ class Category(models.Model):
         return self.name
 
 
+class Manufacturer(models.Model):
+    name = models.CharField(max_length=200)
+
+    class Meta:
+        verbose_name = "Производитель"
+        verbose_name_plural = "Производители"
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     class Meta:
         verbose_name = "Товар"
@@ -28,7 +39,9 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(max_length=3000, blank=True, default="")
     color = models.CharField(max_length=30)
-    manufacturer = models.CharField(max_length=30)
+    manufacturer = models.ForeignKey(
+        Manufacturer, on_delete=models.PROTECT, related_name="+"
+    )
     img_ref = models.URLField()
     characteristics = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -99,7 +112,9 @@ class Order(models.Model):
         RECEIVED = 4, "received"
 
     status = models.IntegerField(choices=Status.choices)
-    pickup_point = models.ForeignKey(PickUpPoint, on_delete=models.CASCADE, related_name="orders")
+    pickup_point = models.ForeignKey(
+        PickUpPoint, on_delete=models.CASCADE, related_name="orders"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
     cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
