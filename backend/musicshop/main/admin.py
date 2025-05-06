@@ -1,7 +1,16 @@
 from django.contrib import admin
 from django.db import models
 from typing import Iterable
-from .models import Product, Order, PickUpPoint, User, Cart, CartItem
+from .models import (
+    Product,
+    Order,
+    PickUpPoint,
+    User,
+    Cart,
+    CartItem,
+    Category,
+    Manufacturer,
+)
 from django.utils.html import format_html
 
 
@@ -9,38 +18,33 @@ def editable_filter(fields: Iterable[models.Field]) -> list[str]:
     return [field.name for field in fields if field.name not in ("created_at", "id")]
 
 
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ["id", "name"]
+    search_fields = ("name",)
+
+
+@admin.register(Manufacturer)
+class ManufacturerAdmin(admin.ModelAdmin):
+    list_display = ["id", "name"]
+    search_fields = ("name",)
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-
-    list_display = [field.name for field in Product._meta.local_fields]
-    # list_editable = editable_filter(Product._meta.local_fields)
-    list_filter = ("color", "manufacturer")
+    list_display = [
+        field.name
+        for field in Product._meta.local_fields
+        if field.name not in ("characteristics", "img_ref", "description")
+    ]
+    list_filter = ("color", "manufacturer", "category")
     search_fields = ("name", "description", "manufacturer")
     list_per_page = 50
-
-    # Для красивого отображения JSONField
-    # readonly_fields = ("display_characteristics",)
-
-    # def display_characteristics(self, instance):
-    #     if instance.characteristics:
-    #         import json
-    #         from django.utils.html import format_html
-
-    #         return format_html(
-    #             "<pre>{}</pre>", json.dumps(instance.characteristics, indent=2)
-    #         )
-    #     return "-"
-
-    # display_characteristics.short_description = "Characteristics"
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = [
-        field.name
-        for field in Order._meta.get_fields()
-        if field.name not in ("user", "pickup_point", "items")
-    ]
+    list_display = [field.name for field in Order._meta.get_fields() if field.name not in ("items")]
     list_editable = ("status",)
     list_per_page = 50
 
@@ -54,16 +58,7 @@ class PickUpPointAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in User._meta.local_fields]
-
-
-# @admin.register(Cart)
-# class CartAdmin(admin.ModelAdmin):
-#     list_display = [field.name for field in Cart._meta.local_fields]
-
-# @admin.register(CartItem)
-# class CartItemAdmin(admin.ModelAdmin):
-#     list_display = [field.name for field in CartItem._meta.local_fields]
+    list_display = [field.name for field in User._meta.local_fields if field.name not in ("password",)]
 
 
 class CartItemInline(admin.TabularInline):  # или admin.StackedInline для другого вида
@@ -105,13 +100,13 @@ class CartAdmin(admin.ModelAdmin):
     items_count.short_description = "Товаров в корзине"
 
 
-@admin.register(CartItem)
-class CartItemAdmin(admin.ModelAdmin):
-    list_display = ["cart", "product", "quantity", "total_price_display"]
-    list_filter = ["cart__user", "product"]
-    search_fields = ["product__name", "cart__user__username"]
+# @admin.register(CartItem)
+# class CartItemAdmin(admin.ModelAdmin):
+#     list_display = ["cart", "product", "quantity", "total_price_display"]
+#     list_filter = ["cart__user", "product"]
+#     search_fields = ["product__name", "cart__user__username"]
 
-    def total_price_display(self, obj):
-        return f"{obj.total_price()} ₽"
+#     def total_price_display(self, obj):
+#         return f"{obj.total_price()} ₽"
 
-    total_price_display.short_description = "Сумма"
+#     total_price_display.short_description = "Сумма"

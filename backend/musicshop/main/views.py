@@ -125,6 +125,20 @@ class PickUpPointView(APIView):
         return Response(pickup_points)
 
 
+class CategoryView(APIView):
+    def get(self, request: Request) -> Response:
+        return Response(
+            list(CategorySerializer(p).data for p in Category.objects.all())
+        )
+
+
+class ManufacturerView(APIView):
+    def get(self, request: Request) -> Response:
+        return Response(
+            list(ManufacturerSerializer(p).data for p in Manufacturer.objects.all())
+        )
+
+
 class OrderView(APIView):
     authentication_classes = [JWTAuthentication]
 

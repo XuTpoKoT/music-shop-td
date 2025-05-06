@@ -1,8 +1,14 @@
 from rest_framework import serializers
-from .models import *
-import jwt
-from datetime import datetime, timedelta
-from django.conf import settings
+from .models import (
+    PickUpPoint,
+    Product,
+    Category,
+    Order,
+    User,
+    CartItem,
+    Cart,
+    Manufacturer,
+)
 
 
 class PickUpPointSerializer(serializers.ModelSerializer):
@@ -11,11 +17,15 @@ class PickUpPointSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ProductSerializer(serializers.ModelSerializer):
-    manufacturerName = serializers.CharField(source="manufacturer")
-
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Product
+        model = Category
+        fields = "__all__"
+
+
+class ManufacturerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Manufacturer
         fields = "__all__"
 
 
@@ -41,9 +51,7 @@ class OrderResponseSerializer(serializers.ModelSerializer):
         status = data.pop("status")
         data["status"] = Order.Status(status).label
         data["customerUsername"] = User.objects.get(pk=data.pop("user")).email
-        data["pickUpPointAddress"] = PickUpPoint.objects.get(
-            pk=data.pop("pickup_point")
-        ).address
+        data["pickUpPointAddress"] = PickUpPoint.objects.get(pk=data.pop("pickup_point")).address
         return data
 
 
@@ -63,7 +71,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data["manufacturerName"] = data.pop("manufacturer")
+        data["manufacturerName"] = Manufacturer.objects.get(pk=data.pop("manufacturer")).name
         data["imgRef"] = data.pop("img_ref")
         return data
 
@@ -93,18 +101,28 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.Serializer):
+    login = serializers.CharField(max_length=64)
+    firstname = serializers.CharField(max_length=64)
+    surname = serializers.CharField(max_length=64)
+    patronymic = serializers.CharField(max_length=64)
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=6)
 
     def create(self, validated_data):
-        user = User(email=validated_data["email"])
-        user.set_password(validated_data["password"])
+        password = validated_data.pop("password")
+        user = User(**validated_data)
+        user.set_password(password)
         user.save()
         return user
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("Email уже зарегистрирован.")
+            raise serializers.ValidationError("Email уже зарегистрирован")
+        return value
+
+    def validate_login(self, value):
+        if User.objects.filter(login=value).exists():
+            raise serializers.ValidationError("Логин уже занят")
         return value
 
 
