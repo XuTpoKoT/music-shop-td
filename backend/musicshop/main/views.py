@@ -67,7 +67,7 @@ class ProductListPagination(PageNumberPagination):
     def get_paginated_response(self, data):
         return Response(
             {
-                "totalPages": self.page.paginator.count,
+                "totalPages": self.page.paginator.num_pages,
                 "currentPage": self.page.number,
                 "content": data,
             }
