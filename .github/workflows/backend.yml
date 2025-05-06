@@ -34,3 +34,4 @@ jobs:
           cd backend
           docker-compose down web
           docker-compose up web -d --build
+          docker-compose up web -d --build
