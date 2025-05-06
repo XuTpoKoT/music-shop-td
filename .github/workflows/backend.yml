@@ -28,12 +28,9 @@ jobs:
     needs: lint
     runs-on: self-hosted  
     steps:
-      - uses: actions/checkout@v4
       - name: Deploy with Docker Compose
         run: |
-          cd /home/froggy/music-shop  # Путь к проекту на сервере
-          git checkout 2-настройка-cicd
-          git pull origin 2-настройка-cicd
+          cd /home/superfrog/ft/vuz/tkr/repo
           cd backend
           docker-compose down web
-          docker-compose up -d --build
+          docker-compose up web -d --build
