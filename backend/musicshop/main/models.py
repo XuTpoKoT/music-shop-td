@@ -75,6 +75,41 @@ class Cart(models.Model):
         return f"Cart of {self.user.email}"
 
 
+class Order(models.Model):
+    class Meta:
+        verbose_name = "Заказ"
+        verbose_name_plural = "Заказы"
+
+    class Status(models.IntegerChoices):
+        FORMED = 1, "formed"
+        BUILT = 2, "built"
+        DELIVERED = 3, "delivered"
+        RECEIVED = 4, "received"
+
+    status = models.IntegerField(choices=Status.choices)
+    pickup_point = models.ForeignKey(
+        PickUpPoint, on_delete=models.CASCADE, related_name="orders"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
+    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        unique_together = ("order", "product")
+
+    def total_price(self):
+        return self.quantity * self.product.price
+
+    def __str__(self):
+        return f"{self.product.name} × {self.quantity}"
+
+
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
