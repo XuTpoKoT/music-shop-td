@@ -8,19 +8,44 @@ import jwt
 from django.conf import settings
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=200, verbose_name="Название")
+
+    class Meta:
+        verbose_name = "Категория товар"
+        verbose_name_plural = "Категории товаров"
+
+    def __str__(self):
+        return self.name
+
+
+class Manufacturer(models.Model):
+    name = models.CharField(max_length=200, verbose_name="Название")
+
+    class Meta:
+        verbose_name = "Производитель"
+        verbose_name_plural = "Производители"
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
 
-    name = models.CharField(max_length=200)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    description = models.TextField(max_length=3000, blank=True, default="")
-    color = models.CharField(max_length=30)
-    manufacturer = models.CharField(max_length=30)
-    img_ref = models.URLField()
-    characteristics = models.JSONField(default=dict, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=200, verbose_name="Название")
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
+    description = models.TextField(max_length=3000, blank=True, default="", verbose_name="Описание")
+    color = models.CharField(max_length=30, verbose_name="Цвет")
+    manufacturer = models.ForeignKey(
+        Manufacturer, on_delete=models.PROTECT, related_name="+", verbose_name="Производитель"
+    )
+    img_ref = models.URLField(verbose_name="Ссылка на изображение")
+    characteristics = models.JSONField(default=dict, blank=True, verbose_name="Характеристики")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="+", verbose_name="Категория")
 
 
 class PickUpPoint(models.Model):
@@ -28,9 +53,12 @@ class PickUpPoint(models.Model):
         verbose_name = "Пункт выдачи"
         verbose_name_plural = "Пункты выдачи"
 
-    name = models.CharField(max_length=200)
-    address = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=200, verbose_name="Название")
+    address = models.CharField(max_length=1000, verbose_name="Адрес")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
+
+    def __str__(self):
+        return f"{self.address}"
 
 
 class User(models.Model):
@@ -38,12 +66,16 @@ class User(models.Model):
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
 
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=128)
-    created_at = models.DateTimeField(auto_now_add=True)
+    login = models.CharField(max_length=64, unique=True, verbose_name="Логин")
+    firstname = models.CharField(max_length=64, verbose_name="Имя")
+    surname = models.CharField(max_length=64, verbose_name="Фамилия")
+    patronymic = models.CharField(max_length=64, verbose_name="Отчество")
+    email = models.EmailField(unique=True, verbose_name="Эл. почта")
+    password = models.CharField(max_length=128, verbose_name="Пароль")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     def __str__(self):
-        return f"User id={self.pk} email={self.email}"
+        return f"{self.surname} {self.firstname} {self.patronymic} ({self.login})"
 
     def set_password(self, password):
         self.password = hashlib.sha256(password.encode()).hexdigest()
@@ -54,7 +86,6 @@ class User(models.Model):
     def generate_jwt(self):
         payload = {
             "user_id": str(self.pk),
-            "email": self.email,
             "exp": datetime.utcnow() + timedelta(days=7),
         }
         return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
@@ -65,8 +96,8 @@ class Cart(models.Model):
         verbose_name = "Корзина"
         verbose_name_plural = "Корзины"
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="cart")
-    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="cart", verbose_name="Пользователь")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
 
     def total_price(self):
         return sum(item.total_price() for item in self.items.all())
@@ -86,19 +117,19 @@ class Order(models.Model):
         DELIVERED = 3, "delivered"
         RECEIVED = 4, "received"
 
-    status = models.IntegerField(choices=Status.choices)
+    status = models.IntegerField(choices=Status.choices, verbose_name="Статус")
     pickup_point = models.ForeignKey(
-        PickUpPoint, on_delete=models.CASCADE, related_name="orders"
+        PickUpPoint, on_delete=models.PROTECT, related_name="orders", verbose_name="Пункт выдачи"
     )
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="orders", verbose_name="Заказчик")
+    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Стоимость")
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
-    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items", verbose_name="Заказ")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Товар")
+    quantity = models.PositiveIntegerField(default=1, verbose_name="Количество")
 
     class Meta:
         unique_together = ("order", "product")
@@ -111,9 +142,9 @@ class OrderItem(models.Model):
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items", verbose_name="Корзина")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Продукт")
+    quantity = models.PositiveIntegerField(default=1, verbose_name="Количество")
 
     class Meta:
         unique_together = (
