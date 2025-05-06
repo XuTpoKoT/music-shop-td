@@ -72,7 +72,7 @@ class User(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     def __str__(self):
-        return f"login={self.login}"
+        return f"{self.login}"
 
     def set_password(self, password):
         self.password = hashlib.sha256(password.encode()).hexdigest()
@@ -114,11 +114,13 @@ class Order(models.Model):
         DELIVERED = 3, "delivered"
         RECEIVED = 4, "received"
 
-    status = models.IntegerField(choices=Status.choices)
-    pickup_point = models.ForeignKey(PickUpPoint, on_delete=models.CASCADE, related_name="orders")
+    status = models.IntegerField(choices=Status.choices, verbose_name="Статус")
+    pickup_point = models.ForeignKey(
+        PickUpPoint, on_delete=models.PROTECT, related_name="orders", verbose_name="Пункт выдачи"
+    )
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="orders", verbose_name="Заказчик")
+    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Стоимость")
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
-    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
 
 class OrderItem(models.Model):

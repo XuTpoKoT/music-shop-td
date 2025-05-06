@@ -71,7 +71,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data["manufacturerName"] = data.pop("manufacturer")
+        data["manufacturerName"] = Manufacturer.objects.get(pk=data.pop("manufacturer")).name
         data["imgRef"] = data.pop("img_ref")
         return data
 

@@ -21,14 +21,12 @@ def editable_filter(fields: Iterable[models.Field]) -> list[str]:
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ["id", "name"]
-    list_filter = ("name",)
     search_fields = ("name",)
 
 
 @admin.register(Manufacturer)
 class ManufacturerAdmin(admin.ModelAdmin):
     list_display = ["id", "name"]
-    list_filter = ("name",)
     search_fields = ("name",)
 
 
@@ -43,7 +41,7 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
-        field.name for field in Order._meta.get_fields() if field.name not in ("user", "pickup_point", "items")
+        field.name for field in Order._meta.get_fields() if field.name not in ("pickup_point", "items")
     ]
     list_editable = ("status",)
     list_per_page = 50
