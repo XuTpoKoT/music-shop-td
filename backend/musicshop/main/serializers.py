@@ -5,6 +5,38 @@ from datetime import datetime, timedelta
 from django.conf import settings
 
 
+
+class ProductSerializer(serializers.ModelSerializer):
+    manufacturerName = serializers.CharField(source="manufacturer")
+
+    class Meta:
+        model = Product
+        fields = "__all__"
+
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = [
+            "id",
+            "name",
+            "price",
+            "description",
+            "color",
+            "manufacturer",
+            "img_ref",
+            "characteristics",
+        ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["manufacturerName"] = data.pop("manufacturer")
+        data["imgRef"] = data.pop("img_ref")
+        return data
+
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -29,7 +61,6 @@ class SignUpSerializer(serializers.Serializer):
 
 
 class SignInSerializer(serializers.Serializer):
-    # TODO: username
     email = serializers.EmailField()
     password = serializers.CharField()
 
