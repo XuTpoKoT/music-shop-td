@@ -1,8 +1,5 @@
 from rest_framework import serializers
-from .models import *
-import jwt
-from datetime import datetime, timedelta
-from django.conf import settings
+from .models import PickUpPoint, Product, Category, Order, User, CartItem, Cart
 
 
 class PickUpPointSerializer(serializers.ModelSerializer):
@@ -11,11 +8,9 @@ class PickUpPointSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ProductSerializer(serializers.ModelSerializer):
-    manufacturerName = serializers.CharField(source="manufacturer")
-
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Product
+        model = Category
         fields = "__all__"
 
 
@@ -41,9 +36,7 @@ class OrderResponseSerializer(serializers.ModelSerializer):
         status = data.pop("status")
         data["status"] = Order.Status(status).label
         data["customerUsername"] = User.objects.get(pk=data.pop("user")).email
-        data["pickUpPointAddress"] = PickUpPoint.objects.get(
-            pk=data.pop("pickup_point")
-        ).address
+        data["pickUpPointAddress"] = PickUpPoint.objects.get(pk=data.pop("pickup_point")).address
         return data
 
 
