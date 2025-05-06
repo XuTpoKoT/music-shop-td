@@ -17,11 +17,18 @@ Including another URLconf
 
 from django.urls import path
 from main.views import (
+    ProductListAPIView,
+    ProductDetailAPIView,
+    CartItemView,
     SignUpView,
     SignInView,
 )
 
+
 urlpatterns = [
+    path("v1/products", ProductListAPIView.as_view(), name="product-list"),
+    path("v1/products/<int:pk>", ProductDetailAPIView.as_view(), name="product-detail"),
+    path("v1/cart", CartItemView.as_view(), name="cart-item-create"),
     path("v1/signin", SignInView.as_view(), name="signin"),
     path("v1/signup", SignUpView.as_view(), name="signup"),
 ]

@@ -8,6 +8,21 @@ import jwt
 from django.conf import settings
 
 
+class Product(models.Model):
+    class Meta:
+        verbose_name = "Товар"
+        verbose_name_plural = "Товары"
+
+    name = models.CharField(max_length=200)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField(max_length=3000, blank=True, default="")
+    color = models.CharField(max_length=30)
+    manufacturer = models.CharField(max_length=30)
+    img_ref = models.URLField()
+    characteristics = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 
 class User(models.Model):
     class Meta:
