@@ -1,0 +1,37 @@
+name: backend
+
+on:
+  push:
+    # paths:
+    #   - 'backend/**'
+
+jobs:
+  lint:
+    name: lint
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+      
+      - name: Install Black
+        run: |
+          pip install black
+      
+      - name: Check formatting
+        run: |
+          black --check backend || true
+        
+  deploy:
+    name: deploy
+    needs: lint
+    runs-on: self-hosted  
+    steps:
+      - name: Deploy with Docker Compose
+        run: |
+          cd /home/superfrog/ft/vuz/tkr/repo
+          cd backend
+          docker-compose down web
+          docker-compose up web -d --build
+          docker-compose up web -d --build
