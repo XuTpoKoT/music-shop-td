@@ -34,34 +34,16 @@ class ManufacturerAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-
-    list_display = [field.name for field in Product._meta.local_fields]
+    list_display = [field.name for field in Product._meta.local_fields if field.name not in ("characteristics", "img_ref", "description")]
     list_filter = ("color", "manufacturer", "category")
     search_fields = ("name", "description", "manufacturer")
     list_per_page = 50
-
-    # Для красивого отображения JSONField
-    # readonly_fields = ("display_characteristics",)
-
-    # def display_characteristics(self, instance):
-    #     if instance.characteristics:
-    #         import json
-    #         from django.utils.html import format_html
-
-    #         return format_html(
-    #             "<pre>{}</pre>", json.dumps(instance.characteristics, indent=2)
-    #         )
-    #     return "-"
-
-    # display_characteristics.short_description = "Characteristics"
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
-        field.name
-        for field in Order._meta.get_fields()
-        if field.name not in ("user", "pickup_point", "items")
+        field.name for field in Order._meta.get_fields() if field.name not in ("user", "pickup_point", "items")
     ]
     list_editable = ("status",)
     list_per_page = 50
@@ -76,16 +58,7 @@ class PickUpPointAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in User._meta.local_fields]
-
-
-# @admin.register(Cart)
-# class CartAdmin(admin.ModelAdmin):
-#     list_display = [field.name for field in Cart._meta.local_fields]
-
-# @admin.register(CartItem)
-# class CartItemAdmin(admin.ModelAdmin):
-#     list_display = [field.name for field in CartItem._meta.local_fields]
+    list_display = [field.name for field in User._meta.local_fields if field.name not in ("password",)]
 
 
 class CartItemInline(admin.TabularInline):  # или admin.StackedInline для другого вида
