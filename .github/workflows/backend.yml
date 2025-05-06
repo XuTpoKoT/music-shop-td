@@ -2,8 +2,8 @@ name: backend
 
 on:
   push:
-    # paths:
-    #   - 'backend/**'
+    paths:
+      - 'backend/**'
 
 jobs:
   lint:
@@ -33,5 +33,4 @@ jobs:
           cd /home/superfrog/ft/vuz/tkr/repo
           cd backend
           docker-compose down web
-          docker-compose up web -d --build
           docker-compose up web -d --build
