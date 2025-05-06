@@ -5,6 +5,11 @@ from datetime import datetime, timedelta
 from django.conf import settings
 
 
+class PickUpPointSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PickUpPoint
+        fields = "__all__"
+
 
 class ProductSerializer(serializers.ModelSerializer):
     manufacturerName = serializers.CharField(source="manufacturer")
@@ -12,7 +17,6 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = "__all__"
-
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -35,6 +39,22 @@ class ProductSerializer(serializers.ModelSerializer):
         data["imgRef"] = data.pop("img_ref")
         return data
 
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+
+    class Meta:
+        model = CartItem
+        fields = ["product", "quantity"]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["count"] = data.pop("quantity")
+        product: dict = data.pop("product")
+        data["imgRef"] = product["imgRef"]
+        data["name"] = product["name"]
+        data["id"] = product["id"]
+        return data
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -61,6 +81,7 @@ class SignUpSerializer(serializers.Serializer):
 
 
 class SignInSerializer(serializers.Serializer):
+    # TODO: username
     email = serializers.EmailField()
     password = serializers.CharField()
 
@@ -75,3 +96,82 @@ class SignInSerializer(serializers.Serializer):
 
         data["user"] = user
         return data
+
+
+class CartItemCreateSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(write_only=True)
+    product_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = CartItem
+        fields = ["user_id", "product_id", "quantity"]
+        extra_kwargs = {"quantity": {"min_value": 1, "default": 1}}
+
+    def validate_user_id(self, value):
+        try:
+            user = User.objects.get(pk=value)
+            if not hasattr(user, "cart"):
+                Cart.objects.create(user=user)
+            return value
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User not found")
+
+    def validate_product_id(self, value):
+        if not Product.objects.filter(pk=value).exists():
+            raise serializers.ValidationError("Product not found")
+        return value
+
+    def create(self, validated_data):
+        user = User.objects.get(pk=validated_data["user_id"])
+        product = Product.objects.get(pk=validated_data["product_id"])
+
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=user.cart,
+            product=product,
+            defaults={"quantity": validated_data["quantity"]},
+        )
+
+        if not created:
+            cart_item.quantity += validated_data["quantity"]
+            cart_item.save()
+
+        return cart_item
+
+
+class CartItemDeleteSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(write_only=True)
+    product_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = CartItem
+        fields = ["user_id", "product_id"]
+
+    def validate_user_id(self, value):
+        try:
+            user = User.objects.get(pk=value)
+            if not hasattr(user, "cart"):
+                Cart.objects.create(user=user)
+            return value
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User not found")
+
+    def validate_product_id(self, value):
+        if not Product.objects.filter(pk=value).exists():
+            raise serializers.ValidationError("Product not found")
+        return value
+
+    def create(self, validated_data):
+        user = User.objects.get(pk=validated_data["user_id"])
+        product = Product.objects.get(pk=validated_data["product_id"])
+
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=user.cart,
+            product=product,
+            defaults={"quantity": validated_data["quantity"]},
+        )
+
+        if not created:
+            cart_item.quantity += validated_data["quantity"]
+            cart_item.save()
+
+        return cart_item

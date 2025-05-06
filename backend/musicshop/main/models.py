@@ -23,6 +23,15 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class PickUpPoint(models.Model):
+    class Meta:
+        verbose_name = "Пункт выдачи"
+        verbose_name_plural = "Пункты выдачи"
+
+    name = models.CharField(max_length=200)
+    address = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
 class User(models.Model):
     class Meta:
@@ -50,3 +59,35 @@ class User(models.Model):
         }
         return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
 
+
+class Cart(models.Model):
+    class Meta:
+        verbose_name = "Корзина"
+        verbose_name_plural = "Корзины"
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="cart")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def total_price(self):
+        return sum(item.total_price() for item in self.items.all())
+
+    def __str__(self):
+        return f"Cart of {self.user.email}"
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        unique_together = (
+            "cart",
+            "product",
+        )  # нельзя дважды добавить один и тот же товар
+
+    def total_price(self):
+        return self.quantity * self.product.price
+
+    def __str__(self):
+        return f"{self.product.name} × {self.quantity}"
