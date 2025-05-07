@@ -70,9 +70,21 @@ class CartItemDeleteView(APIView):
         print([c.id for c in CartItem.objects.all()])
         if ci:
             ci.delete()
-            return Response("",status=status.HTTP_200_OK)
+            return Response("", status=status.HTTP_200_OK)
         else:
-            return Response("",status=status.HTTP_400_BAD_REQUEST)
+            return Response("", status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, pk):
+        ci = CartItem.objects.filter(pk=pk).first()
+        if ci:
+            s= PatchCartItemSerializer(data=request.data)
+            if not s.is_valid():
+                return Response(s.errors, status=status.HTTP_400_BAD_REQUEST)
+            ci.quantity = s.validated_data["count"]
+            ci.save()
+            return Response("", status=status.HTTP_200_OK)
+        else:
+            return Response("", status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProductDetailAPIView(APIView):
@@ -114,6 +126,7 @@ class UserView(APIView):
 
 class OrderView(APIView):
     authentication_classes = [JWTAuthentication]
+    pagination_class = ProductListPagination
 
     def post(self, request: Request) -> Response:
         user = User.objects.get(pk=request.user.id)
@@ -127,7 +140,7 @@ class OrderView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         order = Order(
-            pickup_point=PickUpPoint.objects.get(pk=serializer.validated_data["pickup_point_id"]),
+            pickup_point=PickUpPoint.objects.get(pk=serializer.validated_data["pickUpPointId"]),
             status=Order.Status.FORMED,
             user=user,
         )
@@ -142,10 +155,17 @@ class OrderView(APIView):
 
         return Response(OrderResponseSerializer(order).data, status=status.HTTP_201_CREATED)
 
-    def get(self, request: Request) -> Response:
-        user = User.objects.get(pk=request.user.id)
-        user_orders = Order.objects.filter(user=user)
-        return Response(OrderResponseSerializer(user_orders, many=True).data)
+    def get(self, request):
+        orders = Order.objects.all()
+
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(orders, request)
+        if page is not None:
+            serializer = OrderResponseSerializer(page, many=True)
+        else:
+            serializer = OrderResponseSerializer(Order.objects.none(), many=True)
+
+        return paginator.get_paginated_response(serializer.data)
 
 
 class SignUpView(APIView):
@@ -189,7 +209,7 @@ class CartItemView(APIView):
                     "name": cart_item.product.name,
                     "imgRef": cart_item.product.img_ref,
                     "count": cart_item.quantity,
-                    "price": cart_item.product.price,
+                    "price": str(cart_item.product.price),
                 },
                 status=status.HTTP_201_CREATED,
             )

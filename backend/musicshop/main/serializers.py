@@ -30,20 +30,24 @@ class ManufacturerSerializer(serializers.ModelSerializer):
 
 
 class OrderCreateRequestSerializer(serializers.Serializer):
-    pickup_point_id = serializers.IntegerField(min_value=1)
+    pickUpPointId = serializers.IntegerField(min_value=1)
 
-    def validate_pickup_point_id(self, value: int) -> int:
+    def validate_pickUpPointId(self, value: int) -> int:
         try:
             PickUpPoint.objects.get(pk=value)
             return value
         except PickUpPoint.DoesNotExist:
             raise serializers.ValidationError("Pickup point not found")
 
+class PatchCartItemSerializer(serializers.Serializer):
+    count = serializers.IntegerField()
+
+
 
 class OrderResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ["status", "pickup_point", "created_at", "user", "cost"]
+        fields = ["status", "pickup_point", "created_at", "user", "cost", "id"]
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
