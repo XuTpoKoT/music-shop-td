@@ -26,6 +26,8 @@ from main.views import (
     OrderView,
     CategoryView,
     ManufacturerView,
+    UserView,
+    CartItemDeleteView,
 )
 from django.contrib import admin
 
@@ -35,9 +37,11 @@ urlpatterns = [
     path("v1/products/<int:pk>", ProductDetailAPIView.as_view(), name="product-detail"),
     path("v1/pickup-points", PickUpPointView.as_view(), name="pickup-list"),
     path("v1/cart", CartItemView.as_view(), name="cart-item-create"),
+    path("v1/cart/<int:pk>", CartItemDeleteView.as_view(), name="cart-item-delete"),
     path("v1/signin", SignInView.as_view(), name="signin"),
     path("v1/signup", SignUpView.as_view(), name="signup"),
     path("v1/orders", OrderView.as_view(), name="orders"),
     path("v1/categories", CategoryView.as_view(), name="categories"),
     path("v1/manufacturers", ManufacturerView.as_view(), name="manufacturers"),
+    path("v1/user", UserView.as_view(), name="manufacturers"),
 ]

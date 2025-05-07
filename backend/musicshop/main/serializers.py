@@ -30,20 +30,24 @@ class ManufacturerSerializer(serializers.ModelSerializer):
 
 
 class OrderCreateRequestSerializer(serializers.Serializer):
-    pickup_point_id = serializers.IntegerField(min_value=1)
+    pickUpPointId = serializers.IntegerField(min_value=1)
 
-    def validate_pickup_point_id(self, value: int) -> int:
+    def validate_pickUpPointId(self, value: int) -> int:
         try:
             PickUpPoint.objects.get(pk=value)
             return value
         except PickUpPoint.DoesNotExist:
             raise serializers.ValidationError("Pickup point not found")
 
+class PatchCartItemSerializer(serializers.Serializer):
+    count = serializers.IntegerField()
+
+
 
 class OrderResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ["status", "pickup_point", "created_at", "user", "cost"]
+        fields = ["status", "pickup_point", "created_at", "user", "cost", "id"]
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -81,7 +85,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartItem
-        fields = ["product", "quantity"]
+        fields = ["product", "quantity", "id"]
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -89,14 +93,14 @@ class CartItemSerializer(serializers.ModelSerializer):
         product: dict = data.pop("product")
         data["imgRef"] = product["imgRef"]
         data["name"] = product["name"]
-        data["id"] = product["id"]
+        data["price"] = product["price"]
         return data
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "email"]
+        fields = ["id", "email", "login", "firstname", "surname", "patronymic"]
         extra_kwargs = {"password": {"write_only": True}}
 
 
@@ -128,12 +132,12 @@ class SignUpSerializer(serializers.Serializer):
 
 class SignInSerializer(serializers.Serializer):
     # TODO: username
-    email = serializers.EmailField()
+    login = serializers.CharField()
     password = serializers.CharField()
 
     def validate(self, data: dict) -> dict:
         try:
-            user = User.objects.get(email=data["email"])
+            user = User.objects.get(login=data["login"])
         except User.DoesNotExist:
             raise serializers.ValidationError("Invalid credentials")
 

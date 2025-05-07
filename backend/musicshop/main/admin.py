@@ -100,13 +100,3 @@ class CartAdmin(admin.ModelAdmin):
     items_count.short_description = "Товаров в корзине"
 
 
-# @admin.register(CartItem)
-# class CartItemAdmin(admin.ModelAdmin):
-#     list_display = ["cart", "product", "quantity", "total_price_display"]
-#     list_filter = ["cart__user", "product"]
-#     search_fields = ["product__name", "cart__user__username"]
-
-#     def total_price_display(self, obj):
-#         return f"{obj.total_price()} ₽"
-
-#     total_price_display.short_description = "Сумма"
