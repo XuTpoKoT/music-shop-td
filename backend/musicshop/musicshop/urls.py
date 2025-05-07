@@ -26,6 +26,7 @@ from main.views import (
     OrderView,
     CategoryView,
     ManufacturerView,
+    UserView,
 )
 from django.contrib import admin
 
@@ -40,4 +41,5 @@ urlpatterns = [
     path("v1/orders", OrderView.as_view(), name="orders"),
     path("v1/categories", CategoryView.as_view(), name="categories"),
     path("v1/manufacturers", ManufacturerView.as_view(), name="manufacturers"),
+    path("v1/user", UserView.as_view(), name="manufacturers"),
 ]
