@@ -2,14 +2,8 @@ name: backend
 
 on:
   push:
-    branches: [ main ]
-    paths:
       - 'backend/**'
-  pull_request:
-    branches: [ main ] 
-    paths:
-      - 'backend/**'
-
+  
 jobs:
   lint:
     name: lint
