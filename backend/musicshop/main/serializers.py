@@ -128,12 +128,12 @@ class SignUpSerializer(serializers.Serializer):
 
 class SignInSerializer(serializers.Serializer):
     # TODO: username
-    email = serializers.EmailField()
+    login = serializers.CharField()
     password = serializers.CharField()
 
     def validate(self, data: dict) -> dict:
         try:
-            user = User.objects.get(email=data["email"])
+            user = User.objects.get(login=data["login"])
         except User.DoesNotExist:
             raise serializers.ValidationError("Invalid credentials")
 
