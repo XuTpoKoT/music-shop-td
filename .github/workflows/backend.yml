@@ -2,7 +2,8 @@ name: backend
 
 on:
   push:
-      - 'backend/**'
+    paths:
+    - 'backend/**'
   
 jobs:
   lint:
