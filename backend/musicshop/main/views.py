@@ -67,6 +67,7 @@ class ProductListAPIView(APIView):
 class CartItemDeleteView(APIView):
     def delete(self, request: Request, pk: int):
         ci = CartItem.objects.filter(pk=pk).first()
+        print([c.id for c in CartItem.objects.all()])
         if ci:
             ci.delete()
             return Response("",status=status.HTTP_200_OK)
