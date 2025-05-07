@@ -1,43 +1,3 @@
-# from django.shortcuts import render
-#
-
-# from django.views import View
-# from django.shortcuts import get_object_or_404
-# from .models import Product
-
-# from django.http import JsonResponse
-# from django.views.decorators.csrf import csrf_exempt
-
-
-# class ProductView(View):
-#     def get(self, request, product_id=None):
-#         if product_id:
-#             product = get_object_or_404(Product, id=product_id)
-#             return JsonResponse(product_to_dict(product))
-#         products = Product.objects.all().values()
-#         return JsonResponse(list(products), safe=False)
-
-#     @csrf_exempt
-#     def post(self, request):
-#         data = json.loads(request.body)
-#         product = Product.objects.create(**data)
-#         return JsonResponse(product_to_dict(product))
-
-#     @csrf_exempt
-#     def put(self, request, product_id):
-#         product = get_object_or_404(Product, id=product_id)
-#         data = json.loads(request.body)
-#         for key, value in data.items():
-#             setattr(product, key, value)
-#         product.save()
-#         return JsonResponse(product_to_dict(product))
-
-#     @csrf_exempt
-#     def delete(self, request, product_id):
-#         product = get_object_or_404(Product, id=product_id)
-#         product.delete()
-#         return JsonResponse({"message": "Product deleted"})
-
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
@@ -130,6 +90,7 @@ class CategoryView(APIView):
 
 
 class ManufacturerView(APIView):
+
     def get(self, request: Request) -> Response:
         return Response(list(ManufacturerSerializer(p).data for p in Manufacturer.objects.all()))
 
