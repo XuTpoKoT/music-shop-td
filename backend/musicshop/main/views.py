@@ -42,6 +42,7 @@ class ProductListAPIView(APIView):
         max_price = request.GET.get("max_price")
         manufacturers = [int(x) for x in request.GET.getlist("manufacturers")]
         prefix = request.GET.get("productPrefix")
+        category_id = request.GET.get("categoryId")
 
         products = Product.objects.all()
 
@@ -53,6 +54,8 @@ class ProductListAPIView(APIView):
             products = products.filter(manufacturer__in=manufacturers)
         if prefix:
             products = products.filter(name__istartswith=prefix)
+        if category_id:
+            products = products.filter(category__pk=category_id)
 
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(products, request)
@@ -77,7 +80,7 @@ class CartItemDeleteView(APIView):
     def patch(self, request, pk):
         ci = CartItem.objects.filter(pk=pk).first()
         if ci:
-            s= PatchCartItemSerializer(data=request.data)
+            s = PatchCartItemSerializer(data=request.data)
             if not s.is_valid():
                 return Response(s.errors, status=status.HTTP_400_BAD_REQUEST)
             ci.quantity = s.validated_data["count"]
@@ -103,18 +106,24 @@ class ProductDetailAPIView(APIView):
 
 class PickUpPointView(APIView):
     def get(self, request: Request) -> Response:
-        pickup_points = list(PickUpPointSerializer(p).data for p in PickUpPoint.objects.all())
+        pickup_points = list(
+            PickUpPointSerializer(p).data for p in PickUpPoint.objects.all()
+        )
         return Response(pickup_points)
 
 
 class CategoryView(APIView):
     def get(self, request: Request) -> Response:
-        return Response(list(CategorySerializer(p).data for p in Category.objects.all()))
+        return Response(
+            list(CategorySerializer(p).data for p in Category.objects.all())
+        )
 
 
 class ManufacturerView(APIView):
     def get(self, request: Request) -> Response:
-        return Response(list(ManufacturerSerializer(p).data for p in Manufacturer.objects.all()))
+        return Response(
+            list(ManufacturerSerializer(p).data for p in Manufacturer.objects.all())
+        )
 
 
 class UserView(APIView):
@@ -133,27 +142,35 @@ class OrderView(APIView):
 
         cart_items = list(user.cart.items.all())
         if not cart_items:
-            return Response({"error": "Корзина пуста"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Корзина пуста"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         serializer = OrderCreateRequestSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         order = Order(
-            pickup_point=PickUpPoint.objects.get(pk=serializer.validated_data["pickUpPointId"]),
+            pickup_point=PickUpPoint.objects.get(
+                pk=serializer.validated_data["pickUpPointId"]
+            ),
             status=Order.Status.FORMED,
             user=user,
         )
         order.save()
 
         for cart_item in cart_items:
-            OrderItem(order=order, quantity=cart_item.quantity, product=cart_item.product).save()
+            OrderItem(
+                order=order, quantity=cart_item.quantity, product=cart_item.product
+            ).save()
             order.cost += cart_item.product.price * cart_item.quantity
         order.save()
 
         user.cart.items.all().delete()
 
-        return Response(OrderResponseSerializer(order).data, status=status.HTTP_201_CREATED)
+        return Response(
+            OrderResponseSerializer(order).data, status=status.HTTP_201_CREATED
+        )
 
     def get(self, request):
         orders = Order.objects.all()
@@ -192,7 +209,9 @@ class SignInView(APIView):
         serializer = SignInSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data["user"]
-            return Response({"user": UserSerializer(user).data, "token": user.generate_jwt()})
+            return Response(
+                {"user": UserSerializer(user).data, "token": user.generate_jwt()}
+            )
         return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
 
@@ -200,7 +219,9 @@ class CartItemView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def post(self, request: Request):
-        serializer = CartItemCreateSerializer(data=request.data | {"user_id": request.user.id})
+        serializer = CartItemCreateSerializer(
+            data=request.data | {"user_id": request.user.id}
+        )
         if serializer.is_valid():
             cart_item = serializer.save()
             return Response(
@@ -216,5 +237,7 @@ class CartItemView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request: Request) -> Response:
-        items = CartItem.objects.filter(cart__user=request.user).prefetch_related("product")
+        items = CartItem.objects.filter(cart__user=request.user).prefetch_related(
+            "product"
+        )
         return Response(CartItemSerializer(items, many=True).data)

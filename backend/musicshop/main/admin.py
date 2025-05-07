@@ -44,7 +44,9 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in Order._meta.get_fields() if field.name not in ("items")]
+    list_display = [
+        field.name for field in Order._meta.get_fields() if field.name not in ("items")
+    ]
     list_editable = ("status",)
     list_per_page = 50
 
@@ -58,7 +60,11 @@ class PickUpPointAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in User._meta.local_fields if field.name not in ("password",)]
+    list_display = [
+        field.name
+        for field in User._meta.local_fields
+        if field.name not in ("password",)
+    ]
 
 
 class CartItemInline(admin.TabularInline):  # или admin.StackedInline для другого вида
@@ -98,5 +104,3 @@ class CartAdmin(admin.ModelAdmin):
         return obj.items.count()
 
     items_count.short_description = "Товаров в корзине"
-
-
