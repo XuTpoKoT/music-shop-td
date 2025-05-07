@@ -60,32 +60,6 @@ const FiltersView = (props: {
           ))}
         </RadioGroup>
       </Box>
-
-      {/* Производители */}
-      <Box sx={{ mt: 4 }}>
-        <Typography sx={{ fontFamily: 'Arial, sans-serif', fontSize: '24px' }}>
-            Производители
-        </Typography>
-        {/* <FormGroup>
-            {manufacturers?.length ? (
-                manufacturers.map(manufacturer => (
-                <FormControlLabel
-                    key={manufacturer.id}
-                    control={
-                    <Checkbox
-                        checked={selectedManufacturers.includes(manufacturer.id)}
-                        onChange={handleManufacturerChange}
-                        value={manufacturer.id}
-                    />
-                    }
-                    label={manufacturer.name}
-                />
-                ))
-            ) : (
-                <div>Производители не загружены</div>
-            )}
-        </FormGroup> */}
-        </Box>
     </Box>
     );
 };
