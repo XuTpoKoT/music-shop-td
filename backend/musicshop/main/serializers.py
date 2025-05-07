@@ -81,7 +81,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartItem
-        fields = ["product", "quantity"]
+        fields = ["product", "quantity", "id"]
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -89,7 +89,6 @@ class CartItemSerializer(serializers.ModelSerializer):
         product: dict = data.pop("product")
         data["imgRef"] = product["imgRef"]
         data["name"] = product["name"]
-        data["id"] = product["id"]
         data["price"] = product["price"]
         return data
 
