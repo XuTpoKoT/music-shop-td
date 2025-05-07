@@ -11,7 +11,14 @@ interface AuthState {
     isAuth: boolean;
     setIsAuth: (isAuth: boolean) => void;
     signIn: (email: string, password: string, navigate: (path: string) => void) => void;
-    signUp: (email: string, password: string, repeatedPassword: string, navigate: (path: string) => void) => void;
+    signUp: (data: {
+        login: string;
+        password: string;
+        email: string;
+        firstname: string;
+        surname: string;
+        patronymic?: string;
+    }, navigate: (path: string) => void) => void;
 }
 
 export const extractPayload = (token: string): any => {
@@ -41,7 +48,7 @@ const useAuthStore = create<AuthState>(set => ({
             const payload = extractPayload(response.token)
             localStorage.setItem('token', response.token)
             localStorage.setItem('role', payload.role)
-            localStorage.setItem('username', response.username)
+            localStorage.setItem('username', response.user.login)
             console.log('Token saved:', localStorage.getItem('token'))
             navigate('/')
         } catch (e) {                    
@@ -51,15 +58,22 @@ const useAuthStore = create<AuthState>(set => ({
             useErrorStore.setState({errorMessage: errMsg})
         }
     },
-    signUp: async (email: string, password: string, repeatedPassword: string, navigate: (path: string) => void) => {
+    signUp: async (data: {
+        login: string;
+        password: string;
+        email: string;
+        firstname: string;
+        surname: string;
+        patronymic?: string;
+    }, navigate: (path: string) => void) => {
         set({status: RequestStatus.Loading})
         try {
-            const response = await AuthApi.signUp(email, password, repeatedPassword)
+            const response = await AuthApi.signUp(data)
             set({ status: RequestStatus.Success, authInfo: response, isAuth: true });
             const payload = extractPayload(response.token)
             localStorage.setItem('token', response.token)
             localStorage.setItem('role', payload.role)
-            localStorage.setItem('username', response.username)
+            localStorage.setItem('username', response.user.login)
             console.log('Token saved:', localStorage.getItem('token'))
             navigate('/')
         } catch (e) {                    

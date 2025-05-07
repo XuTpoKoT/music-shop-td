@@ -18,6 +18,13 @@ export const ProductsPageMainContent = () => {
         const pageNumber = searchParams.get("pageNumber")
             ? parseInt(searchParams.get("pageNumber")!, 10)
             : undefined;
+        const minPrice = searchParams.get("minPrice")
+            ? parseInt(searchParams.get("minPrice")!, 10)
+            : undefined;
+        const maxPrice = searchParams.get("maxPrice")
+            ? parseInt(searchParams.get("maxPrice")!, 10)
+            : undefined;
+        const manufacturers = searchParams.get("manufacturers") || undefined;
 
         console.log("Main pref", productPrefix, "Page", pageNumber);
         setProductPrefix(productPrefix!)

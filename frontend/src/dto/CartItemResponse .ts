@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const CartItemResponseSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   name: z.string(),
-  price: z.number(),
+  price: z.string(),
   imgRef: z.string(),
   count: z.number(),
 });

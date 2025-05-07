@@ -1,13 +1,12 @@
 import { z } from "zod";
 
 export const OrderSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   customerUsername: z.string(),
   timestamp: z.string().datetime(),
   status: z.string(),
   pickUpPointAddress: z.string(),
-  initialCost: z.number(),
-  paidByBonuses: z.number(),
+  cost: z.string(),
 });
 
 export type Order = z.infer<typeof OrderSchema>;
