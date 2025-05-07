@@ -64,6 +64,16 @@ class ProductListAPIView(APIView):
         return paginator.get_paginated_response(serializer.data)
 
 
+class CartItemDeleteView(APIView):
+    def delete(self, request: Request, pk: int):
+        ci = CartItem.objects.filter(pk=pk).first()
+        if ci:
+            ci.delete()
+            return Response("",status=status.HTTP_200_OK)
+        else:
+            return Response("",status=status.HTTP_400_BAD_REQUEST)
+
+
 class ProductDetailAPIView(APIView):
     def get_object(self, pk: int):
         try:
@@ -99,6 +109,7 @@ class UserView(APIView):
 
     def get(self, request: Request) -> Response:
         return Response(UserSerializer(User.objects.get(pk=request.user.id)).data)
+
 
 class OrderView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -174,9 +185,10 @@ class CartItemView(APIView):
             return Response(
                 {
                     "id": cart_item.id,
-                    "product": cart_item.product.name,
-                    "quantity": cart_item.quantity,
-                    "total_price": str(cart_item.total_price()),
+                    "name": cart_item.product.name,
+                    "imgRef": cart_item.product.img_ref,
+                    "count": cart_item.quantity,
+                    "price": cart_item.product.price,
                 },
                 status=status.HTTP_201_CREATED,
             )
