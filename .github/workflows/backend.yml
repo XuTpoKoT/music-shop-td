@@ -21,7 +21,7 @@ jobs:
       
       - name: Check formatting
         run: |
-          black --check backend || true
+          black --check backend
         
   deploy:
     name: deploy
@@ -32,5 +32,6 @@ jobs:
         run: |
           cd /home/superfrog/ft/vuz/tkr/repo
           cd backend
+          git pull origin main
           docker-compose down web
           docker-compose up web -d --build

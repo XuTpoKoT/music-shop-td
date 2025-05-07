@@ -39,9 +39,9 @@ class OrderCreateRequestSerializer(serializers.Serializer):
         except PickUpPoint.DoesNotExist:
             raise serializers.ValidationError("Pickup point not found")
 
+
 class PatchCartItemSerializer(serializers.Serializer):
     count = serializers.IntegerField()
-
 
 
 class OrderResponseSerializer(serializers.ModelSerializer):
@@ -55,7 +55,9 @@ class OrderResponseSerializer(serializers.ModelSerializer):
         status = data.pop("status")
         data["status"] = Order.Status(status).label
         data["customerUsername"] = User.objects.get(pk=data.pop("user")).email
-        data["pickUpPointAddress"] = PickUpPoint.objects.get(pk=data.pop("pickup_point")).address
+        data["pickUpPointAddress"] = PickUpPoint.objects.get(
+            pk=data.pop("pickup_point")
+        ).address
         return data
 
 
@@ -75,7 +77,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data["manufacturerName"] = Manufacturer.objects.get(pk=data.pop("manufacturer")).name
+        data["manufacturerName"] = Manufacturer.objects.get(
+            pk=data.pop("manufacturer")
+        ).name
         data["imgRef"] = data.pop("img_ref")
         return data
 

@@ -37,15 +37,24 @@ class Product(models.Model):
 
     name = models.CharField(max_length=200, verbose_name="Название")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
-    description = models.TextField(max_length=3000, blank=True, default="", verbose_name="Описание")
+    description = models.TextField(
+        max_length=3000, blank=True, default="", verbose_name="Описание"
+    )
     color = models.CharField(max_length=30, verbose_name="Цвет")
     manufacturer = models.ForeignKey(
-        Manufacturer, on_delete=models.PROTECT, related_name="+", verbose_name="Производитель"
+        Manufacturer,
+        on_delete=models.PROTECT,
+        related_name="+",
+        verbose_name="Производитель",
     )
     img_ref = models.URLField(verbose_name="Ссылка на изображение")
-    characteristics = models.JSONField(default=dict, blank=True, verbose_name="Характеристики")
+    characteristics = models.JSONField(
+        default=dict, blank=True, verbose_name="Характеристики"
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="+", verbose_name="Категория")
+    category = models.ForeignKey(
+        Category, on_delete=models.PROTECT, related_name="+", verbose_name="Категория"
+    )
 
 
 class PickUpPoint(models.Model):
@@ -96,7 +105,9 @@ class Cart(models.Model):
         verbose_name = "Корзина"
         verbose_name_plural = "Корзины"
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="cart", verbose_name="Пользователь")
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="cart", verbose_name="Пользователь"
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
 
     def total_price(self):
@@ -119,15 +130,24 @@ class Order(models.Model):
 
     status = models.IntegerField(choices=Status.choices, verbose_name="Статус")
     pickup_point = models.ForeignKey(
-        PickUpPoint, on_delete=models.PROTECT, related_name="orders", verbose_name="Пункт выдачи"
+        PickUpPoint,
+        on_delete=models.PROTECT,
+        related_name="orders",
+        verbose_name="Пункт выдачи",
     )
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="orders", verbose_name="Заказчик")
-    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Стоимость")
+    user = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name="orders", verbose_name="Заказчик"
+    )
+    cost = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Стоимость"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items", verbose_name="Заказ")
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name="items", verbose_name="Заказ"
+    )
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Товар")
     quantity = models.PositiveIntegerField(default=1, verbose_name="Количество")
 
@@ -142,8 +162,12 @@ class OrderItem(models.Model):
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items", verbose_name="Корзина")
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Продукт")
+    cart = models.ForeignKey(
+        Cart, on_delete=models.CASCADE, related_name="items", verbose_name="Корзина"
+    )
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, verbose_name="Продукт"
+    )
     quantity = models.PositiveIntegerField(default=1, verbose_name="Количество")
 
     class Meta:
