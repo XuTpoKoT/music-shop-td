@@ -34,6 +34,7 @@ class ProductListPagination(PageNumberPagination):
         )
 
 
+
 class ProductListAPIView(APIView):
     pagination_class = ProductListPagination
 
