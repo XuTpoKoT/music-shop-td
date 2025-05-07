@@ -9,7 +9,7 @@ export default class ProductsApi {
         pageNumber?: number,
         min_price?: number,
         max_price?: number,
-        manufacturers?: string[]
+        manufacturers?: number[]
     ) {
         return await $api.get<ProductPageResponse>('/products', {
                 params: {

@@ -3,7 +3,9 @@ import axios, { AxiosError } from 'axios';
 import { z } from 'zod';
 
 // export const API_URL = `http://185.246.66.229:8000/v1`
-export const API_URL = `http://192.168.1.246:8000/v1`
+// export const API_URL = `http://192.168.1.246:8000/v1`
+export const API_URL = import.meta.env.VITE_API_URL + '/v1';
+
 
 const $api = axios.create({
     withCredentials: true,

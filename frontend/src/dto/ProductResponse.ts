@@ -8,7 +8,7 @@ export const ProductResponseSchema = z.object({
   color: z.string(),
   manufacturerName: z.string(),
   imgRef: z.string(),
-  characteristics: z.record(z.string()),
+  characteristics: z.record(z.union([z.string(), z.number()])),
   count: z.number().nullable().optional(),
 });
 

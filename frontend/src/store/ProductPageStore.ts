@@ -16,7 +16,13 @@ interface ProductPageState {
     productPrefix: string;
     setSelectedPage: (pageNumber: number) => void;
     setProductPrefix: (productPrefix: string) => void;
-    fetchProductPage: (categoryId?: string, productPrefix?: string, pageNumber?: number) => void;
+    fetchProductPage: (
+        categoryId?: string,
+        productPrefix?: string,
+        pageNumber?: number,
+        min_price?: number,
+        max_price?: number,
+        manufacturers?: number[]) => void;
     addToCart: (productId: string) => void;
 }
 
@@ -53,7 +59,14 @@ const useProductPageStore = create<ProductPageState>()(
             },
             setSelectedPage: (pageNumber) => set({ selectedPage: pageNumber }),
             setProductPrefix: (newProductPrefix) => set({ productPrefix: newProductPrefix }),
-            fetchProductPage: async (categoryId, productPrefix?: string, pageNumber?: number) => {
+            fetchProductPage: async (
+                categoryId?: string,
+                productPrefix?: string,
+                pageNumber?: number,
+                min_price?: number,
+                max_price?: number,
+                manufacturers?: number[]
+            ) => {
                 set({status: RequestStatus.Loading})
                 try {
                     const response = await ProductsApi.getProducts(categoryId, productPrefix, pageNumber)

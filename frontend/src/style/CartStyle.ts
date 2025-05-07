@@ -96,7 +96,7 @@ export const MakeOrderStyle = {
     alignItems: 'center',
     // rowGap: '50px',
     width: '320px',
-    height: '300px',
+    height: '150px',
     mt: '50px',
     py: '15px',
     px: '10px',
