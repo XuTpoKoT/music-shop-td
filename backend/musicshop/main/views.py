@@ -90,7 +90,6 @@ class CategoryView(APIView):
 
 
 class ManufacturerView(APIView):
-
     def get(self, request: Request) -> Response:
         return Response(list(ManufacturerSerializer(p).data for p in Manufacturer.objects.all()))
 
