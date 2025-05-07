@@ -133,7 +133,7 @@ class SignInSerializer(serializers.Serializer):
 
     def validate(self, data: dict) -> dict:
         try:
-            user = User.objects.get(loginw=data["login"])
+            user = User.objects.get(login=data["login"])
         except User.DoesNotExist:
             raise serializers.ValidationError("Invalid credentials")
 
