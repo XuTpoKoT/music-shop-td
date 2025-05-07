@@ -90,6 +90,7 @@ class CartItemSerializer(serializers.ModelSerializer):
         data["imgRef"] = product["imgRef"]
         data["name"] = product["name"]
         data["id"] = product["id"]
+        data["price"] = product["price"]
         return data
 
 
