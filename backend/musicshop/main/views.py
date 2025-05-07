@@ -134,6 +134,12 @@ class ManufacturerView(APIView):
         return Response(list(ManufacturerSerializer(p).data for p in Manufacturer.objects.all()))
 
 
+class UserView(APIView):
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request: Request) -> Response:
+        return Response(UserSerializer(User.objects.get(pk=request.user.id)).data)
+
 class OrderView(APIView):
     authentication_classes = [JWTAuthentication]
 

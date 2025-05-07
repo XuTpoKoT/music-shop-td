@@ -96,7 +96,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "email"]
+        fields = ["id", "email", "login", "firstname", "surname", "patronymic"]
         extra_kwargs = {"password": {"write_only": True}}
 
 

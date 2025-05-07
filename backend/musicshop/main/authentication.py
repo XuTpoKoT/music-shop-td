@@ -9,7 +9,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
         auth_header = request.headers.get("Authorization")
 
         if not auth_header or not auth_header.startswith("Bearer "):
-            return None
+            raise exceptions.AuthenticationFailed("Authorization header expected")
 
         token = auth_header.split(" ")[1]
 
